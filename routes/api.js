@@ -10,15 +10,15 @@ mongoose.connect(process.env['MONGO_URI'])
 
 // Schema for the issues
 const issueSchema = new mongoose.Schema({
-  issue_title: String,
-  issue_text: String,
-  created_on: Date,
-  updated_on: Date,
-  created_by: String,
-  assigned_to: String,
-  open: Boolean,
-  status_text: String,
-  project_name: String
+  issue_title: { type: String, default: "" },
+  issue_text: { type: String, default: "" },
+  created_on: { type: Date, default: Date.now },
+  updated_on: { type: Date, default: Date.now },
+  created_by: { type: String, default: "" },
+  assigned_to: { type: String, default: "" },
+  open: { type: Boolean, default: true },
+  status_text: { type: String, default: "" },
+  project_name: { type: String, default: "" }
 })
 
 // Models
@@ -39,7 +39,7 @@ module.exports = function (app) {
         let projectName = req.params.project
                 
         // Working with issue
-        const { issue_title, issue_text, created_by, assigned_to , status_text } = req.body
+        const { issue_title, issue_text, created_by, assigned_to = "", status_text = "" } = req.body
         if (!issue_title || !issue_text || !created_by) {
           res.json({error: "required field(s) missing"});
           return;
@@ -58,7 +58,9 @@ module.exports = function (app) {
           project_name: projectName
         })
         issueToAdd.save()
-        res.json(issueToAdd)
+        let issueObject = issueToAdd.toObject();
+        delete issueObject.project_name;
+        res.json(issueObject);
       }
       catch (error) {
         console.log(error)
