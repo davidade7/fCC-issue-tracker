@@ -28,12 +28,22 @@ const Issue = mongoose.model('Issue', issueSchema);
 module.exports = function (app) {
 
   app.route("/api/issues/:project")
-
-    // .get(function (req, res){
-    //   let project = req.params.project;
-    //   console.log('get',req.body)
-    // })
+    // get route
+    .get(async (req, res) => {
+      let project = req.params.project;
+      // creation of query variable to be added in the find method
+      let query = { project_name: project }
+      // cycle through the query parameters and add them to the query object
+      for (let key in req.query) {
+        query[key] = req.query[key]
+      }
     
+      let result = await Issue.find(query).exec()
+      
+      res.json(result)
+    })
+    
+    // post route
     .post((req, res) => {
       try {
         let projectName = req.params.project
