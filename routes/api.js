@@ -80,11 +80,52 @@ module.exports = function (app) {
       }
     })
     
-    // .put(function (req, res){
-    //   let project = req.params.project;
-    //   console.log('put',req.body)
-    // })
-    
+    // Put route
+    .put(async (req, res) => {
+      try {
+        // Check if the _id is present
+        if (!req.body._id) {
+          return res.json({ error: 'missing _id' });
+        }
+        
+        // Creating the update object
+        let update = {}
+        for (let key in req.body) {
+          if (req.body[key] && key !== '_id') {
+            update[key] = req.body[key]
+          }
+        }
+
+        // Check if there are no fields to update
+        if (Object.keys(update).length === 0) { 
+          return res.json({ error: 'no update field(s) sent', '_id': req.body._id });
+        }
+
+        try {
+          // Update the issue
+          const updatedIssue = await Issue.findByIdAndUpdate(
+            {_id: req.body._id}, 
+            { ...update, updated_on: new Date()}
+          );
+          
+          // Check if the issue wasn't updated
+          if (!updatedIssue) {
+            return res.json({ error: 'could not update', '_id': req.body._id });
+          }
+        
+          // Return the response
+          res.json({ result: 'successfully updated', '_id': req.body._id });
+        } 
+        // Catch the error
+        catch (err) {
+          res.json({ error: 'could not update', '_id': req.body._id });
+        }
+      }
+      catch (error) {
+        return res.json({ error: 'could not update', '_id': req.body._id });
+      }
+    })
+  
     // .delete(function (req, res){
     //   let project = req.params.project;
     //   console.log('delete',req.body)
