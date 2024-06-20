@@ -83,7 +83,7 @@ module.exports = function (app) {
     // Put route
     .put(async (req, res) => {
       try {
-        // Check if the _id is present
+        // Check if the _id is not present
         if (!req.body._id) {
           return res.json({ error: 'missing _id' });
         }
@@ -126,9 +126,26 @@ module.exports = function (app) {
       }
     })
   
-    // .delete(function (req, res){
-    //   let project = req.params.project;
-    //   console.log('delete',req.body)
-    // });
-    
+    //  Delete route
+    .delete(async (req, res) => {
+      // Check if the _id is not present
+      if (!req.body._id) {
+        return res.json({ error: 'missing _id' });
+      }
+
+      // Try to delete the issue
+      try {
+        // Check if issue is in DB
+        let findIssue = await Issue.findOne({_id: req.body._id}).exec()
+        if (!findIssue) {
+          return res.json({ error: 'could not delete', '_id': req.body._id });
+        }
+        // Then delete the issue
+        await Issue.findOneAndDelete({_id: req.body._id}).exec()
+        return res.json({ result: 'successfully deleted', '_id': req.body._id });
+      }
+      catch (error) {
+        return res.json({ error: 'could not delete', '_id': req.body._id });
+      }
+    });
 };
