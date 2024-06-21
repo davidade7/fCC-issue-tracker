@@ -27,6 +27,7 @@ suite('Functional Tests', function() {
         done();
       });
   }),
+
   test('Test 1-2: Create an issue with only required fields: POST request', (done) => {
     // Setup
     const issue = {
@@ -46,6 +47,7 @@ suite('Functional Tests', function() {
         done();
       });
   }),
+
   test('Test 1-3: Create an issue with missing required fields: POST request', (done) => {
     // Setup
     const issue = {
@@ -215,6 +217,31 @@ suite('Functional Tests', function() {
         // Assert
         assert.equal(res.status, 200);
         assert.equal(res.text, '{"error":"could not update","_id":"667457f4e72337816e3303d2xxxxx"}');
+        done();
+      });
+  }),
+
+  test('Test 1-12: Delete an issue: DELETE request', async (done) => {
+    // We need to find an issue to delete
+    // fCC test are going to create some issues with projet_name: "fcc-project"
+    let project
+    try{
+      project = await Issue.findOne({project_name: "fcc-project"}).exec();
+      console.log('project: ' + project);
+    }
+    catch(err) {
+      console.log('error: ' + err);
+    }
+    
+    // Execute
+    chai
+      .request(server)
+      .delete("/api/issues/test")
+      .send({ _id: project[0]._id })
+      .end(function(err, res) {
+        // Assert
+        assert.equal(res.status, 200);
+        assert.equal(res.text, `{"result":"successfully deleted","_id":"${project[0]._id}"}`);
         done();
       });
   })
