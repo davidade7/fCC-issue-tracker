@@ -239,7 +239,6 @@ suite('Functional Tests', function() {
         // Assert
         assert.equal(res.status, 200);
         assert.equal(res.text, `{"result":"successfully deleted","_id":"${project._id}"}`);
-        done();
       });
   }),
 
