@@ -3,6 +3,9 @@ const chai = require('chai');
 const assert = chai.assert;
 const server = require('../server');
 
+// import the issue model
+const Issue = require('../models/issueSchema');
+
 chai.use(chaiHttp);
 
 suite('Functional Tests', function() {
@@ -221,27 +224,21 @@ suite('Functional Tests', function() {
       });
   }),
 
-  test('Test 1-12: Delete an issue: DELETE request', async (done) => {
+  test('Test 1-12: Delete an issue: DELETE request', async () => {
     // We need to find an issue to delete
-    // fCC test are going to create some issues with projet_name: "fcc-project"
-    let project
-    try{
-      project = await Issue.findOne({project_name: "fcc-project"}).exec();
-      console.log('project: ' + project);
-    }
-    catch(err) {
-      console.log('error: ' + err);
-    }
-    
+    // fCC tests are going to create some issues with projet_name: "fcc-project"
+    let project = await Issue.findOne({project_name: "fcc-project"}).exec();
+    // console.log('project: ' + project);
+
     // Execute
     chai
       .request(server)
       .delete("/api/issues/test")
-      .send({ _id: project[0]._id })
+      .send({ _id: project._id })
       .end(function(err, res) {
         // Assert
         assert.equal(res.status, 200);
-        assert.equal(res.text, `{"result":"successfully deleted","_id":"${project[0]._id}"}`);
+        assert.equal(res.text, `{"result":"successfully deleted","_id":"${project._id}"}`);
         done();
       });
   })
