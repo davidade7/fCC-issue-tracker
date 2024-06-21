@@ -87,7 +87,7 @@ suite('Functional Tests', function() {
         assert.property(res.body[0], '_id')
         done();
       });
-  })
+  }),
 
   test('Test 1-5: View issues on a project with one filter: GET request', (done) => {
     // Execute
@@ -110,7 +110,7 @@ suite('Functional Tests', function() {
         assert.property(res.body[0], '_id')
         done();
       });
-  })
+  }),
 
   test('Test 1-6: View issues on a project with multiple filters: GET request', (done) => {
     // Execute
@@ -131,6 +131,90 @@ suite('Functional Tests', function() {
         assert.property(res.body[0], 'open')
         assert.property(res.body[0], 'status_text')
         assert.property(res.body[0], '_id')
+        done();
+      });
+  }),
+
+  test('Test 1-7: Update one field on an issue: PUT request', (done) => {
+    // Setup
+    const update = {
+      issue_title: "Test 3"
+    };
+
+    // Execute
+    chai
+      .request(server)
+      .put("/api/issues/test")
+      .send({ _id: "667457f4e72337816e3303d2", ...update })
+      .end(function(err, res) {
+        // Assert
+        assert.equal(res.status, 200);
+        assert.equal(res.text, '{"result":"successfully updated","_id":"667457f4e72337816e3303d2"}');
+        done();
+      });
+  }),
+
+  test('Test 1-8: Update multiple fields on an issue: PUT request', (done) => {
+    // Setup
+    const update = {
+      issue_title: "Test 3",
+      issue_text: "functionnal test 1-8"
+    };
+
+    // Execute
+    chai
+      .request(server)
+      .put("/api/issues/test")
+      .send({ _id: "667457f4e72337816e3303d2", ...update })
+      .end(function(err, res) {
+        // Assert
+        assert.equal(res.status, 200);
+        assert.equal(res.text, '{"result":"successfully updated","_id":"667457f4e72337816e3303d2"}');
+        done();
+      });
+  }),
+
+  test('Test 1-9: Update an issue with missing _id: PUT request', (done) => {
+    // Execute
+    chai
+      .request(server)
+      .put("/api/issues/test")
+      .send({})
+      .end(function(err, res) {
+        // Assert
+        assert.equal(res.status, 200);
+        assert.equal(res.text, '{"error":"missing _id"}');
+        done();
+      });
+  }),
+
+  test('Test 1-10: Update an issue with no fields to update: PUT request', (done) => {
+    // Execute
+    chai
+      .request(server)
+      .put("/api/issues/test")
+      .send({ _id: "667457f4e72337816e3303d2" })
+      .end(function(err, res) {
+        // Assert
+        assert.equal(res.status, 200);
+        assert.equal(res.text, '{"error":"no update field(s) sent","_id":"667457f4e72337816e3303d2"}');
+        done();
+      });
+  }),
+
+  test('Test 1-11: Update an issue with an invalid _id: PUT request', (done) => {
+    const update = {
+      assigned_to: "David"
+    };
+    // Execute
+    chai
+      .request(server)
+      .put("/api/issues/test")
+      .send({ _id: "667457f4e72337816e3303d2xxxxx", ...update })
+      .end(function(err, res) {
+        // Assert
+        assert.equal(res.status, 200);
+        assert.equal(res.text, '{"error":"could not update","_id":"667457f4e72337816e3303d2xxxxx"}');
         done();
       });
   })
