@@ -241,5 +241,33 @@ suite('Functional Tests', function() {
         assert.equal(res.text, `{"result":"successfully deleted","_id":"${project._id}"}`);
         done();
       });
+  }),
+
+  test('Test 1-13: Delete an issue with an invalid _id: DELETE request', (done) => {
+    // Execute
+    chai
+      .request(server)
+      .delete("/api/issues/test")
+      .send({ _id: "123" })
+      .end(function(err, res) {
+        // Assert
+        assert.equal(res.status, 200);
+        assert.equal(res.text, `{"error":"could not delete","_id":"123"}`);
+        done();
+      });
+  }),
+
+  test('Test 1-14: Delete an issue with missing _id: DELETE request', (done) => {
+    // Execute
+    chai
+      .request(server)
+      .delete("/api/issues/test")
+      .send({})
+      .end(function(err, res) {
+        // Assert
+        assert.equal(res.status, 200);
+        assert.equal(res.text, `{"error":"missing _id"}`);
+        done();
+      });
   })
 });
